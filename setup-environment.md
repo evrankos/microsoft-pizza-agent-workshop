@@ -9,11 +9,11 @@ Before writing any agent code, you must configure your development environment, 
 We use a consistent, pre-configured development environment. You can set this up locally or run it via **GitHub Codespaces**.
 
 ### Environment Prerequisites
-- **Python**: Version `3.10` or higher (Python `3.13` is recommended).
-- **Azure CLI**: Installed and available in your path (for terminal authentication).
-- **Core Dependencies**: Installed via your package manager or pip:
+- **Python**: Version `3.10` or higher (we recommend using the latest stable release; refer to the package requirements defined in [`requirements.txt`](./requirements.txt)).
+- **Azure CLI**: Installed and available in your terminal path.
+- **Core Dependencies**: Installed via your package manager or pip using the provided dependencies manifest:
   ```bash
-  pip install azure-identity azure-ai-projects openai python-dotenv
+  pip install -r requirements.txt
   ```
 
 ---
@@ -40,6 +40,9 @@ To run AI agents, you need an active Azure subscription with access to the **Mic
    - Locate and click your newly created `Pizza-Workshop` project.
    - Ensure the new modern AI Foundry interface is toggled ON.
 
+> [!NOTE]
+> Cloud management dashboards are updated frequently by Microsoft. If the layout of the AI Foundry Portal or the Azure Portal does not match these instructions exactly, refer to the official [Azure AI Agent Service documentation](https://learn.microsoft.com/azure/ai-studio/how-to/develop-templates) for the latest user interface path maps.
+
 ---
 
 ## 3. Deploying the GPT-4o Model
@@ -50,6 +53,9 @@ AI Agent Service leverages deployed LLM endpoints within your project context.
 2. **Choose Model**: Select the **gpt-4o** model from the catalog list and click **Deploy**.
 3. **Deployment Settings**: Keep the default deployment configurations, naming the deployment `gpt-4o` (or match your preferred environment variable definition).
 4. **Test in Playground**: Go to the **Model Playground** once deployment is active, type "Hello world", and verify that you receive a structured response from the model.
+
+> [!TIP]
+> Model catalog lists evolve over time. If `gpt-4o` is not available in your deployed subscription region, choose any other compatible GPT model (like `gpt-4o-mini`) and match the deployment name inside your local `.env` variables.
 
 ---
 
@@ -63,6 +69,9 @@ Create a `.env` file in the root of your project directory (the same folder cont
 ```env
 PROJECT_ENDPOINT="https://<your-foundry-resource>.services.ai.azure.com/api/projects/<your-project-name>"
 MODEL_DEPLOYMENT_NAME="gpt-4o"
+
+# Optional: Override the live Contoso Pizza MCP server URL if redeployed
+MCP_SERVER_URL="https://ca-pizza-mcp-sc6u2typoxngc.graypond-9d6dd29c.eastus2.azurecontainerapps.io/sse"
 ```
 
 > [!NOTE]

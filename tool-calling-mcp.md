@@ -54,12 +54,15 @@ def calculate_pizza_order(people: int) -> str:
 
 The **Model Context Protocol (MCP)** is an open standard that enables models to connect to external systems seamlessly. Rather than writing custom SDK connectors for every database or API, you connect to an MCP server, which dynamically registers its available tools to the agent.
 
-We connect to the Contoso Pizza backend MCP server deployed on Azure Container Apps:
+We connect to the Contoso Pizza backend MCP server deployed on Azure Container Apps, using an environment variable override if available:
 
 ```python
 mcpTool = MCPTool(
     server_label="contoso-pizza-mcp",
-    server_url="https://ca-pizza-mcp-sc6u2typoxngc.graypond-9d6dd29c.eastus2.azurecontainerapps.io/sse",
+    server_url=os.environ.get(
+        "MCP_SERVER_URL", 
+        "https://ca-pizza-mcp-sc6u2typoxngc.graypond-9d6dd29c.eastus2.azurecontainerapps.io/sse"
+    ),
     require_approval="never"
 )
 ```

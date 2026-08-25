@@ -47,7 +47,10 @@ Through this project, you will learn and apply:
 
 ## Document Site Roadmap
 
-1. **[1. Introduction & Overview](./introduction.md)** (This page)
-2. **[2. Environment & Azure Setup](./setup-environment.md)**: Authenticating, setting up the Azure Resource Group, deploying models, and loading variables.
-3. **[3. Building Your First Agent](./building-agent.md)**: Creating the agent, setting system instructions, and enabling File Search (RAG) using your local store docs in `docs/contoso-stores/`.
-4. **[4. Tools & MCP Integration](./tool-calling-mcp.md)**: Activating function tools, hooking into SSE MCP server endpoints, handling conversational loops, and testing live pizza ordering.
+**[1. Introduction & Overview](./introduction.md)** (This page)
+
+**[2. Environment & Azure Setup](./setup-environment.md)**: Authenticating, setting up the Azure Resource Group, deploying models, and loading variables.
+
+**[3. Building Your First Agent](./building-agent.md)**: Creating the agent, setting system instructions, and enabling File Search (RAG) using your local store docs in `docs/contoso-stores/`.
+
+**[4. Tools & MCP Integration](./tool-calling-mcp.md)**: Activating function tools, hooking into SSE MCP server endpoints, handling conversational loops, and testing live pizza ordering.

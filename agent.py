@@ -55,7 +55,10 @@ def calculate_pizza_order(people: int) -> str:  # <-- FIXED: Function name updat
 ## -- MCP -- ##
 mcpTool = MCPTool(
     server_label="contoso-pizza-mcp",
-    server_url="https://ca-pizza-mcp-sc6u2typoxngc.graypond-9d6dd29c.eastus2.azurecontainerapps.io/sse",
+    server_url=os.environ.get(
+        "MCP_SERVER_URL", 
+        "https://ca-pizza-mcp-sc6u2typoxngc.graypond-9d6dd29c.eastus2.azurecontainerapps.io/sse"
+    ),
     require_approval="never"
 )
 ## -- MCP -- ##
