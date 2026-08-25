@@ -11,7 +11,7 @@ In this final chapter, we extend **Contoso PizzaBot**'s reasoning capabilities b
 While LLMs excel at language comprehension, they are not reliable for exact calculations. We offload order sizing math to a local Python function wrapped in a structured schema.
 
 ### Defining the Tool Schema
-In [`agent.py`](./agent.py#L25-L41), we define a strict parameters schema for the pizza calculator tool:
+In [`agent.py`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L25-L41), we define a strict parameters schema for the pizza calculator tool:
 
 ```python
 func_tool = FunctionTool(

@@ -6,9 +6,9 @@ In this chapter, you will build the core Python script to instantiate the Azure 
 
 ## 1. Project Client Initialization
 
-To connect to Azure AI Foundry Agent Service, we initialize [`AIProjectClient`](./agent.py#L12) using our configured environment endpoints and credentials. We also get the OpenAI compatibility client to run responses.
+To connect to Azure AI Foundry Agent Service, we initialize [`AIProjectClient`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L12) using our configured environment endpoints and credentials. We also get the OpenAI compatibility client to run responses.
 
-Here is the initialization setup from [`agent.py`](./agent.py#L1-L17):
+Here is the initialization setup from [`agent.py`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L1-L17):
 
 ```python
 import os
@@ -36,7 +36,7 @@ openai_client = project_client.get_openai_client()
 
 ## 2. Shaping Behavior with System Instructions
 
-System prompts instruct the LLM on its persona, objectives, reasoning pathways, and formatting limits. For PizzaBot, we configure detailed instructions within [`agent.py`](./agent.py#L63-L100):
+System prompts instruct the LLM on its persona, objectives, reasoning pathways, and formatting limits. For PizzaBot, we configure detailed instructions within [`agent.py`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L63-L100):
 
 - **Role**: Playful Gen Alpha pizza-ordering assistant connected to store data.
 - **Rules**: Keep conversations focused only on pizza, ask for customer names/delivery details before ordering, and require explicit customer confirmation before checking out.
@@ -65,7 +65,7 @@ Without specific data, the LLM wouldn't know Contoso Pizza's physical branch loc
 Here's how we establish and connect the vector store:
 
 ### Reusing or Uploading Grounding Files
-To optimize execution speed, we check if the vector store already exists before uploading files. During our setup, we uploaded files matching `docs/contoso-stores/*.md` and registered the store ID [`vs_5kJq7AmPC6Zoa9fVGwPTQPnO`](./agent.py#L18):
+To optimize execution speed, we check if the vector store already exists before uploading files. During our setup, we uploaded files matching `docs/contoso-stores/*.md` and registered the store ID [`vs_5kJq7AmPC6Zoa9fVGwPTQPnO`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L18):
 
 ```python
 vector_store_id = "vs_5kJq7AmPC6Zoa9fVGwPTQPnO"
@@ -85,7 +85,7 @@ else:
 ```
 
 ### Adding the FileSearchTool to the Agent
-We bind the vector store to the agent via [`FileSearchTool`](./agent.py#L7):
+We bind the vector store to the agent via [`FileSearchTool`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L7):
 
 ```python
 toolset: list[Tool] = []

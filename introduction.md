@@ -37,10 +37,10 @@ graph TD
 ## Key Skills & Concepts Covered
 
 Through this project, you will learn and apply:
-- **Azure AI Foundry Client SDK**: Initializing [`AIProjectClient`](./agent.py#L12) and orchestrating assistants and runs.
-- **RAG & Semantic Indexing**: Setting up, uploading documents to, and querying vector stores using [`FileSearchTool`](./agent.py#L7).
-- **Strict Schema Tooling**: Exposing Python helper functions to the model with strict JSON validations using [`FunctionTool`](./agent.py#L7).
-- **MCP Integration**: Using the new industry-standard Model Context Protocol via [`MCPTool`](./agent.py#L7) to avoid custom API boilerplate.
+- **Azure AI Foundry Client SDK**: Initializing [`AIProjectClient`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L12) and orchestrating assistants and runs.
+- **RAG & Semantic Indexing**: Setting up, uploading documents to, and querying vector stores using [`FileSearchTool`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L7).
+- **Strict Schema Tooling**: Exposing Python helper functions to the model with strict JSON validations using [`FunctionTool`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L7).
+- **MCP Integration**: Using the new industry-standard Model Context Protocol via [`MCPTool`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L7) to avoid custom API boilerplate.
 - **Agent Loop Execution**: Managing stateful multi-turn runs, handling function call intermediate executions, and handling thread states.
 
 ---
