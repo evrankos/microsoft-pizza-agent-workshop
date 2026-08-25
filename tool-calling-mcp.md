@@ -1,6 +1,6 @@
-# 4. Tools & MCP Integration
+# Tools & MCP Integration
 
-In this final chapter, we extend **Contoso PizzaBot**'s reasoning capabilities by enabling it to perform deterministic actions. We accomplish this through two methods:
+In this final chapter, I document how I extended **Contoso PizzaBot**'s reasoning capabilities by enabling it to perform deterministic actions. I accomplished this through two methods:
 1. **Custom Function Tools**: Executing local Python functions (for pizza quantity estimations).
 2. **Model Context Protocol (MCP) Tools**: Connecting the agent over Server-Sent Events (SSE) to a live backend ordering system.
 
@@ -8,10 +8,10 @@ In this final chapter, we extend **Contoso PizzaBot**'s reasoning capabilities b
 
 ## 1. Custom Function Tools
 
-While LLMs excel at language comprehension, they are not reliable for exact calculations. We offload order sizing math to a local Python function wrapped in a structured schema.
+While LLMs excel at language comprehension, they are not reliable for exact calculations. I offload order sizing math to a local Python function wrapped in a structured schema.
 
 ### Defining the Tool Schema
-In [`agent.py`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L25-L41), we define a strict parameters schema for the pizza calculator tool:
+In [`agent.py`](https://github.com/evrankos/microsoft-pizza-agent-workshop/blob/main/agent.py#L25-L41), I define a strict parameters schema for the pizza calculator tool:
 
 ```python
 func_tool = FunctionTool(
@@ -19,15 +19,27 @@ func_tool = FunctionTool(
     parameters={
         "type": "object",
         "properties": {
-            "people": {
+            "adults": {
                 "type": "integer",
-                "description": "The number of people to order pizza for",
+                "description": "Number of adults eating pizza. Must be 0 or greater.",
+            },
+            "children": {
+                "type": "integer",
+                "description": "Number of children eating pizza. Must be 0 or greater.",
+            },
+            "size": {
+                "type": "string",
+                "enum": ["Personal", "Small", "Medium", "Large", "X-Large"],
+                "description": "The pizza size to order.",
             },
         },
-        "required": ["people"],
+        "required": ["adults", "children", "size"],
         "additionalProperties": False,
     },
-    description="Get the quantity of pizza to order based on the number of people.",
+    description=(
+        "Calculate how many pizzas are needed based on the number of "
+        "adults, children, and pizza size."
+    ),
     strict=True,
 )
 ```
@@ -36,16 +48,49 @@ func_tool = FunctionTool(
 The underlying logic is a deterministic Python function. It calculates the required pizzas assuming each pizza feeds 2 people (rounding up):
 
 ```python
-def calculate_pizza_order(people: int) -> str:
-    """Calculate the number of pizzas to order based on the number of people.
-        Assumes each pizza can feed 2 people.
+SIZE_CAPACITY = {
+    "Personal": 1.0,
+    "Small": 1.5,
+    "Medium": 2.0,
+    "Large": 2.5,
+    "X-Large": 3.0,
+}
+
+def calculate_pizza_order(
+    adults: int,
+    children: int,
+    size: str,
+) -> str:
+    """Calculate the number of pizzas needed for a group.
+
+    Children are counted as 0.5 adult-equivalents.
+
     Args:
-        people (int): The number of people to order pizza for.
+        adults: Number of adults.
+        children: Number of children.
+        size: Pizza size: Personal, Small, Medium, Large, or X-Large.
+
     Returns:
-        str: A message indicating the number of pizzas to order.
+        A message indicating how many pizzas to order.
     """
-    print(f"[FUNCTION CALL:calculate_pizza_order] Calculating pizza quantity for {people} people.")
-    return f"For {people} you need to order {people // 2 + people % 2} pizzas."
+    if adults < 0 or children < 0:
+        raise ValueError("Adults and children cannot be negative.")
+
+    if size not in SIZE_CAPACITY:
+        raise ValueError(
+            f"Invalid pizza size: {size}. "
+            f"Choose from {', '.join(SIZE_CAPACITY)}."
+        )
+
+    adult_equivalents = adults + (children * 0.5)
+    pizzas = max(1, int(
+        -(-adult_equivalents // SIZE_CAPACITY[size])
+    ))
+
+    return (
+        f"For {adults} adults and {children} children, "
+        f"order {pizzas} {size} pizza(s)."
+    )
 ```
 
 ---
@@ -54,7 +99,7 @@ def calculate_pizza_order(people: int) -> str:
 
 The **Model Context Protocol (MCP)** is an open standard that enables models to connect to external systems seamlessly. Rather than writing custom SDK connectors for every database or API, you connect to an MCP server, which dynamically registers its available tools to the agent.
 
-We connect to the Contoso Pizza backend MCP server deployed on Azure Container Apps, using an environment variable override if available:
+I connect to the Contoso Pizza backend MCP server deployed on Azure Container Apps, using an environment variable override if available:
 
 ```python
 mcpTool = MCPTool(
@@ -76,7 +121,7 @@ By appending `mcpTool` to the agent's toolset, the agent automatically discovers
 
 ## 3. Registering the Complete Toolset
 
-The agent's toolset combines our RAG vector store, local function tool, and the live MCP connection:
+The agent's toolset combines my RAG vector store, local function tool, and the live MCP connection:
 
 ```python
 # Assemble all tools
@@ -87,7 +132,7 @@ toolset.append(mcpTool)                                            # MCP Integra
 
 # Create the agent version with the combined toolset
 agent = project_client.agents.create_version(
-    agent_name="evrankos-pizza-guy",
+    agent_name="evrankos-pizza-guy",    # Change it to your own agent name
     definition=PromptAgentDefinition(
         model=os.environ["MODEL_DEPLOYMENT_NAME"],
         instructions=CONTOSO_AGENT_INSTRUCTIONS,
@@ -100,9 +145,9 @@ agent = project_client.agents.create_version(
 
 ## 4. Handling Tool Execution in the Conversation Loop
 
-When the agent decides to invoke a function tool, it returns a `function_call` payload. Our client application must intercept this payload, run the local function, and return the execution results back to the thread.
+When the agent decides to invoke a function tool, it returns a `function_call` payload. My client application must intercept this payload, run the local function, and return the execution results back to the thread.
 
-Here is the tool-handling logic inside our main chat loop:
+Here is the tool-handling logic inside my main chat loop:
 
 ```python
 while True:
@@ -148,14 +193,24 @@ while True:
 
 ---
 
-## 5. Live Testing & Dashboards
+## 5. Live Testing & Integration Results
 
-To place real pizza orders, follow these integration steps:
+During the Microsoft OpenHack workshop, the organizers provided dedicated web applications within the virtual machine (VM) sandbox environment to test and display the challenge results:
+1. **Customer Registration Portal**: Used to register a mock user profile and generate a unique customer `UserID` GUID.
+2. **Real-Time Pizza Dashboard**: Used to monitor the order pipeline, showcasing incoming orders and processing statuses in real time.
 
-1. **Register a User Account**: Visit [Nice Dune Customer Registration Portal](https://nice-dune-07e53ec0f.2.azurestaticapps.net/) to register a customer account and generate a unique User ID GUID.
-2. **Set User Details**: Add your details to your system prompt instructions or pass them directly in chat:
-   ```txt
-   Name: <YOUR NAME>
-   UserId: <YOUR USER GUID>
-   ```
-3. **Monitor Orders**: Open the [Ambitious Stone Pizza Dashboard](https://ambitious-stone-0f6b9760f.2.azurestaticapps.net/) to watch your orders propagate through the system in real-time as your agent calls the MCP tools!
+Because these portals were hosted inside the isolated workshop VM environment, they are not publicly accessible outside that sandbox. However, by supplying the registered `UserID` and customer credentials to my agent within the VM, I successfully demonstrated full end-to-end execution:
+* **Placing Real-Time Orders**: The agent parsed my topping preferences and size guidelines, resolved local quantity estimations, and invoked the `create_order` tool via the MCP server to send the order to the kitchen.
+* **Modifying Orders**: I was able to dynamically modify topping requests and quantities mid-conversation through the agent.
+* **Cancellations**: The agent validated my customer profile and invoked order cancellation APIs via the MCP backend.
+
+The entire lifecycle—from store discovery and order size planning to checkout and cancellation—was executed **purely by chatting with the AI agent I created**, showcasing the seamless capabilities of a RAG-grounded, tool-enabled assistant!
+
+---
+
+## 6. Real-World Production Use Cases
+
+This combined architecture (RAG + Function Calling + MCP) serves as a production-ready template for several enterprise scenarios:
+* **Automated E-Commerce & Retail Checkout**: The combination of system guardrails, local validation functions, and backend MCP tools can be adapted for any retail business (e.g., flower shops, ticket bookings, groceries) to handle inventory, ordering, and user confirmation.
+* **Customer Support & Service Desks**: Using RAG to query company policies, product FAQs, or store directories combined with function tools that trigger ticketing or system modifications (e.g., resetting passwords, updating profiles).
+* **Unified Microservices Agent Orchestration**: Standardizing tool bindings through the Model Context Protocol (MCP) enables enterprises to build a catalog of shared capabilities (database queries, ERP updates) that any agent can discover and invoke without custom SDK integrations.

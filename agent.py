@@ -24,32 +24,77 @@ print(f"Using existing vector store (id: {vector_store.id})")
 
 ## -- Function Calling Tool -- ##
 func_tool = FunctionTool(
-    name="calculate_pizza_order",  # <-- FIXED: Matched name with system instructions
+    name="calculate_pizza_order",
     parameters={
         "type": "object",
         "properties": {
-            "people": {
+            "adults": {
                 "type": "integer",
-                "description": "The number of people to order pizza for",
+                "description": "Number of adults eating pizza. Must be 0 or greater.",
+            },
+            "children": {
+                "type": "integer",
+                "description": "Number of children eating pizza. Must be 0 or greater.",
+            },
+            "size": {
+                "type": "string",
+                "enum": ["Personal", "Medium", "Large", "X-Large"],
+                "description": "The pizza size to order.",
             },
         },
-        "required": ["people"],
+        "required": ["adults", "children", "size"],
         "additionalProperties": False,
     },
-    description="Get the quantity of pizza to order based on the number of people.",
+    description=(
+        "Calculate how many pizzas are needed based on the number of "
+        "adults, children, and pizza size."
+    ),
     strict=True,
 )
 
-def calculate_pizza_order(people: int) -> str:  # <-- FIXED: Function name updated
-    """Calculate the number of pizzas to order based on the number of people.
-        Assumes each pizza can feed 2 people.
+SIZE_CAPACITY = {
+    "Personal": 1.0,
+    "Small": 1.5,
+    "Medium": 2.0,
+    "Large": 2.5,
+    "X-Large": 3.0,
+}
+
+def calculate_pizza_order(
+    adults: int,
+    children: int,
+    size: str,
+) -> str:
+    """Calculate the number of pizzas needed for a group.
+
+    Children are counted as 0.5 adult-equivalents.
+
     Args:
-        people (int): The number of people to order pizza for.
+        adults: Number of adults.
+        children: Number of children.
+        size: Pizza size: Personal, Small, Medium, Large, or X-Large.
+
     Returns:
-        str: A message indicating the number of pizzas to order.
+        A message indicating how many pizzas to order.
     """
-    print(f"[FUNCTION CALL:calculate_pizza_order] Calculating pizza quantity for {people} people.")
-    return f"For {people} you need to order {people // 2 + people % 2} pizzas."
+    if adults < 0 or children < 0:
+        raise ValueError("Adults and children cannot be negative.")
+
+    if size not in SIZE_CAPACITY:
+        raise ValueError(
+            f"Invalid pizza size: {size}. "
+            f"Choose from {', '.join(SIZE_CAPACITY)}."
+        )
+
+    adult_equivalents = adults + (children * 0.5)
+    pizzas = max(1, int(
+        -(-adult_equivalents // SIZE_CAPACITY[size])
+    ))
+
+    return (
+        f"For {adults} adults and {children} children, "
+        f"order {pizzas} {size} pizza(s)."
+    )
 ## -- Function Calling Tool -- ##
 
 ## -- MCP -- ##
@@ -139,7 +184,7 @@ while True:
     input_list: ResponseInputParam = []
     for item in response.output:
         if item.type == "function_call":
-            if item.name == "calculate_pizza_order":  # <-- FIXED: Handled correct function name
+            if item.name == "calculate_pizza_order":
                 # Execute the function logic for calculate_pizza_order
                 pizza_quantity = calculate_pizza_order(**json.loads(item.arguments))
                 # Provide function call results to the model

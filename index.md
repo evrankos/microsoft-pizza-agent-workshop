@@ -3,15 +3,15 @@ layout: home
 
 hero:
   name: "Contoso PizzaBot AI Agent"
-  text: "Build production-grade AI agents using Azure AI Foundry, GPT-4o, RAG, and MCP."
-  tagline: "An enterprise-grade, domain-specific assistant built during the Microsoft OpenHack AI Foundry Workshop."
+  text: "My enterprise-grade AI agent implementation using Azure AI Foundry, GPT-4o, RAG, and MCP."
+  tagline: "Built during the Microsoft OpenHack AI Foundry Workshop."
   actions:
     - theme: brand
-    - text: Get Started
+      text: Get Started
       link: /introduction
     - theme: alt
       text: View on GitHub
-      link: https://github.com/evrankos
+      link: https://github.com/evrankos/microsoft-pizza-agent-workshop
 
 features:
   - title: 🤖 Foundry Agent Service
