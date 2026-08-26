@@ -6,6 +6,7 @@ export default withMermaid(
   defineConfig({
     title: "Contoso PizzaBot Workshop",
     description: "Enterprise AI Agents with Azure AI Foundry and MCP",
+    base: "/microsoft-pizza-agent-workshop/",
     ignoreDeadLinks: true,
     vite: {
       optimizeDeps: {
